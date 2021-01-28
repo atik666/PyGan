@@ -74,6 +74,9 @@ x_train3 = x_train3.astype('float32')
 x_test3 = x_test3.astype('float32')
 x_train4 = x_train4.astype('float32')
 x_test4 = x_test4.astype('float32')
+x_val3 = x_val3.astype('float32')
+x_val4 = x_val4.astype('float32')
+
 # Normalizing the RGB codes by dividing it to the max RGB value.
 x_train3 /= 255
 x_test3 /= 255
@@ -82,6 +85,7 @@ x_test4 /= 255
 print('x_train shape:', x_train3.shape)
 print('Number of images in x_train', x_train3.shape[0])
 print('Number of images in x_test', x_test3.shape[0])
+print('Number of images in x_val', x_val3.shape[0])
 
 # Importing the required Keras modules containing model and layers
 from tensorflow.keras.models import Sequential
@@ -115,7 +119,7 @@ print(model.summary())
 from tensorflow.keras.callbacks import EarlyStopping
 # Define a callback to monitor val_acc
 early_stopping = EarlyStopping(monitor='val_loss', 
-                       patience=10)
+                       patience=5)
 
 h_callback = model.fit(x=[x_train3, x_train4], y= y_train3, epochs=100, batch_size=16,
           validation_data = ([x_val3,x_val4], y_val3), callbacks = [early_stopping])
@@ -130,11 +134,11 @@ def plot_loss(loss,val_loss):
   plt.title('Model loss')
   plt.ylabel('Loss')
   plt.xlabel('Epoch')
-  plt.legend(['Train', 'Test'], loc='upper right')
+  plt.legend(['Train', 'Validation'], loc='upper right')
   plt.show()
   
 # Plot train vs test loss during training
-plot_loss(h_callback.history['loss'], h_callback.history['val_loss'])
+plot_loss(h_callback.history['loss'], (h_callback.history['val_loss'])/100)
 
 def plot_accuracy(acc,val_acc):
   # Plot training & validation accuracy values
@@ -144,7 +148,7 @@ def plot_accuracy(acc,val_acc):
   plt.title('Model accuracy')
   plt.ylabel('Accuracy')
   plt.xlabel('Epoch')
-  plt.legend(['Train', 'Test'], loc='upper left')
+  plt.legend(['Train', 'Validation'], loc='upper left')
   plt.show()
   
 # Plot train vs test accuracy during training

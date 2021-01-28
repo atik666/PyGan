@@ -94,15 +94,15 @@ model.compile(optimizer='adam',
 from tensorflow.keras.callbacks import EarlyStopping
 # Define a callback to monitor val_acc
 early_stopping = EarlyStopping(monitor='val_loss', 
-                       patience=5)
+                       patience=15)
 
 # Train your model using the early stopping callback
 h_callback = model.fit(x_train, y_train, 
-           epochs = 1000, validation_data = (x_val, y_val),
+           epochs = 100, validation_data = (x_val, y_val),
            callbacks = [early_stopping])
 
-acc, loss = model.evaluate(x_test, y_test)
-print(acc, loss)
+loss, acc= model.evaluate(x_test, y_test)
+print('Test Accuracy: %f' % (acc*100))
 
 def plot_loss(loss,val_loss):
   plt.figure()
@@ -111,7 +111,7 @@ def plot_loss(loss,val_loss):
   plt.title('Model loss')
   plt.ylabel('Loss')
   plt.xlabel('Epoch')
-  plt.legend(['Train', 'Test'], loc='upper right')
+  plt.legend(['Train', 'Validation'], loc='upper right')
   plt.show()
   
 def plot_accuracy(acc,val_acc):
@@ -122,18 +122,18 @@ def plot_accuracy(acc,val_acc):
   plt.title('Model accuracy')
   plt.ylabel('Accuracy')
   plt.xlabel('Epoch')
-  plt.legend(['Train', 'Test'], loc='upper left')
+  plt.legend(['Train', 'Validation'], loc='upper left')
   plt.show()
   
 # Plot train vs test loss during training
 plot_loss(h_callback.history['loss'], h_callback.history['val_loss'])
 
 # Plot train vs test accuracy during training
-#plot_accuracy(h_callback.history['acc'], h_callback.history['val_acc'])
+plot_accuracy(h_callback.history['accuracy'], h_callback.history['val_accuracy'])
 
 from sklearn.metrics import confusion_matrix
 pred = model.predict(x_test)
 pred = pred.argmax(axis = 1)
 conf = confusion_matrix(y_test, pred)
 print(conf)
-print('acc : ', np.trace(conf)/np.sum(conf) )
+print('acc : ', np.trace(conf)/np.sum(conf)*100)
